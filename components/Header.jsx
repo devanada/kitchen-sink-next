@@ -29,9 +29,12 @@ const Header = () => {
       </Link>
       <Menu className="bg-white rounded-full">
         {token !== "0" && (
-          <Menu.Item onClick={() => navigate("/profile")}>Profile</Menu.Item>
+          <Menu.Item id="to-profile" onClick={() => router.push("/profile")}>
+            Profile
+          </Menu.Item>
         )}
         <Menu.Item
+          id="btn-mode"
           onClick={() => handleTheme(theme === "dark" ? "light" : "dark")}
           rightSection={theme === "dark" ? <FaSun /> : <FaMoon />}
         >
@@ -42,7 +45,11 @@ const Header = () => {
           <>
             <Divider />
 
-            <Menu.Item color="red" onClick={() => handleLogout()}>
+            <Menu.Item
+              id="btn-logout"
+              color="red"
+              onClick={() => handleLogout()}
+            >
               Logout
             </Menu.Item>
           </>
