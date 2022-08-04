@@ -1,32 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
+import { setCookie } from "cookies-next";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
-import Layout from "../components/Layout";
-import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
-import { TokenContext } from "../utils/context";
+import CustomInput from "../components/CustomInput";
+import Layout from "../components/Layout";
 
 function Login() {
-  const { token, setToken } = useContext(TokenContext);
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
-    if (token !== "0") {
-      router.push("/profile");
+    if (email && password) {
+      setDisabled(false);
     } else {
-      if (email && password) {
-        setDisabled(false);
-      } else {
-        setDisabled(true);
-      }
+      setDisabled(true);
     }
-  }, [token, email, password]);
+  }, [email, password]);
 
   const handleSubmit = async (e) => {
     setLoading(true);
@@ -49,9 +44,8 @@ function Login() {
         const { code, message, data } = result;
         if (code === 200) {
           const { token } = data;
-          localStorage.setItem("token", token);
-          setToken(token);
-          router.push("/profile");
+          setCookie("token", token);
+          router.push("/");
         }
         alert(message);
       })
@@ -82,8 +76,10 @@ function Login() {
           />
           <p className="text-black dark:text-white">
             {`Don't`} have an account? Register{" "}
-            <Link id="to-register" href="/register">
-              here!
+            <Link href="/register">
+              <a id="to-register" className="text-blue-500">
+                here!
+              </a>
             </Link>
           </p>
           <CustomButton
