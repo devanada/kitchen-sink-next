@@ -1,62 +1,53 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect, useContext } from "react";
-import Image from "next/image";
+import { getCookie } from "cookies-next";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
-import Layout from "../components/Layout";
-import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
-import { TokenContext } from "../utils/context";
+import CustomInput from "../components/CustomInput";
+import Layout from "../components/Layout";
 
-function Profile() {
-  const { setToken } = useContext(TokenContext);
-  const router = useRouter();
-  const [objSubmit, setObjSubmit] = useState("");
-  const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [image, setImage] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    var requestOptions = {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+export async function getServerSideProps({ req, res }) {
+  const token = getCookie("token", { req, res });
+  if (!token) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/login",
       },
     };
-
-    fetch(
-      "https://alta-kitchen-sink.herokuapp.com/api/v1/profile",
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        const { message, code, data } = result;
-        const { email, first_name, last_name, image } = data;
-        if ([401, 403].includes(code)) {
-          localStorage.removeItem("token");
-          setToken("0");
-          router.push("/login");
-          alert(message);
-        } else {
-          setEmail(email);
-          setFirstName(first_name);
-          setLastName(last_name);
-          const insertHTTPS = image.replace("http", "https");
-          setImage(insertHTTPS);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => setLoading(false));
+  }
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   };
+  const response = await fetch(
+    "https://alta-kitchen-sink.herokuapp.com/api/v1/profile",
+    requestOptions
+  );
+  const data = await response.json();
+  if (response.status === 200) {
+    return {
+      props: { code: data.code, data: data.data, message: data.message, token },
+    };
+  } else {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/login",
+      },
+    };
+  }
+}
+
+export default function Profile({ data, token }) {
+  const [dataUser, setDataUser] = useState(data);
+  const [objSubmit, setObjSubmit] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     setLoading(true);
@@ -68,20 +59,23 @@ function Profile() {
     var requestOptions = {
       method: "PUT",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${token}`,
       },
       body: formData,
     };
 
-    fetch("http://192.168.1.132:4001/api/v1/profile", requestOptions)
+    fetch(
+      "https://alta-kitchen-sink.herokuapp.com/api/v1/profile",
+      requestOptions
+    )
       .then((response) => response.json())
       .then((result) => {
         const { message } = result;
         alert(message);
         setObjSubmit({});
       })
-      .catch((error) => console.log("error", error))
-      .finally(() => fetchData());
+      .catch((error) => alert(error.toString()))
+      .finally(() => setLoading(false));
   };
 
   const handleChange = (value, key) => {
@@ -90,52 +84,54 @@ function Profile() {
     setObjSubmit(temp);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  } else {
-    return (
-      <Layout>
-        <div className="w-full h-full flex items-center justify-center gap-4">
-          <Image src={image} alt={image} width={200} height={200} />
-          <form
-            className="flex flex-col gap-4 min-w-[40%]"
-            onSubmit={(e) => handleSubmit(e)}
-          >
-            <CustomInput
-              id="input-file"
-              type="file"
-              onChange={(e) => {
-                setImage(URL.createObjectURL(e.target.files[0]));
-                handleChange(e.target.files[0], "image");
-              }}
-            />
-            <CustomInput
-              id="input-email"
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => handleChange(e.target.value, "email")}
-            />
-            <CustomInput
-              id="input-first-name"
-              type="text"
-              placeholder="First Name"
-              value={firstName}
-              onChange={(e) => handleChange(e.target.value, "first_name")}
-            />
-            <CustomInput
-              id="input-last-name"
-              type="text"
-              placeholder="Last Name"
-              value={lastName}
-              onChange={(e) => handleChange(e.target.value, "last_name")}
-            />
-            <CustomButton id="btn-submit" label="Submit" loading={loading} />
-          </form>
-        </div>
-      </Layout>
-    );
-  }
+  return (
+    <Layout>
+      <div className="w-full h-full flex items-center justify-center gap-4">
+        <Image
+          src={dataUser.image}
+          alt={dataUser.image}
+          width={200}
+          height={200}
+        />
+        <form
+          className="flex flex-col gap-4 min-w-[40%]"
+          onSubmit={(e) => handleSubmit(e)}
+        >
+          <CustomInput
+            id="input-file"
+            type="file"
+            onChange={(e) => {
+              setDataUser({
+                ...dataUser,
+                image: URL.createObjectURL(e.target.files[0]),
+              });
+              handleChange(e.target.files[0], "image");
+            }}
+          />
+          <CustomInput
+            id="input-email"
+            type="email"
+            placeholder="Email"
+            value={dataUser.email}
+            onChange={(e) => handleChange(e.target.value, "email")}
+          />
+          <CustomInput
+            id="input-first-name"
+            type="text"
+            placeholder="First Name"
+            value={dataUser.first_name}
+            onChange={(e) => handleChange(e.target.value, "first_name")}
+          />
+          <CustomInput
+            id="input-last-name"
+            type="text"
+            placeholder="Last Name"
+            value={dataUser.last_name}
+            onChange={(e) => handleChange(e.target.value, "last_name")}
+          />
+          <CustomButton id="btn-submit" label="Submit" loading={loading} />
+        </form>
+      </div>
+    </Layout>
+  );
 }
-
-export default Profile;

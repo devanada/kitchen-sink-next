@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 import Layout from "../components/Layout";
 import CustomInput from "../components/CustomInput";
@@ -87,6 +88,14 @@ function Register() {
             placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
           />
+          <p className="text-black dark:text-white">
+            Already have an account? Login{" "}
+            <Link href="/login">
+              <a id="to-login" className="text-blue-500">
+                here!
+              </a>
+            </Link>
+          </p>
           <CustomButton
             id="btn-register"
             label="Register"

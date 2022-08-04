@@ -1,14 +1,15 @@
+import { NotificationsProvider } from "@mantine/notifications";
 import { useState, useMemo, useEffect } from "react";
+import { getCookie } from "cookies-next";
 import { Provider } from "react-redux";
+
 import { wrapper, store } from "../utils/redux/store/store";
-import { ThemeContext, TokenContext } from "../utils/context";
+import { ThemeContext } from "../utils/context";
 import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }) {
-  const [theme, setTheme] = useState("light");
-  const [token, setToken] = useState(null);
+  const [theme, setTheme] = useState(getCookie("theme") || "light");
   const background = useMemo(() => ({ theme, setTheme }), [theme]);
-  const jwtToken = useMemo(() => ({ token, setToken }), [token]);
 
   useEffect(() => {
     if (theme === "dark") {
@@ -18,22 +19,15 @@ function MyApp({ Component, pageProps }) {
     }
   }, [theme]);
 
-  useEffect(() => {
-    const getToken = localStorage.getItem("token") || "0";
-    setToken(getToken);
-  }, [token]);
-
-  if (token) {
-    return (
+  return (
+    <NotificationsProvider>
       <Provider store={store}>
-        <TokenContext.Provider value={jwtToken}>
-          <ThemeContext.Provider value={background}>
-            <Component {...pageProps} />
-          </ThemeContext.Provider>
-        </TokenContext.Provider>
+        <ThemeContext.Provider value={background}>
+          <Component {...pageProps} />
+        </ThemeContext.Provider>
       </Provider>
-    );
-  }
+    </NotificationsProvider>
+  );
 }
 
 export default wrapper.withRedux(MyApp);

@@ -4,6 +4,19 @@ const nextConfig = {
   images: {
     domains: ["res.cloudinary.com"],
   },
+  redirects: async () => [
+    {
+      source: "/login",
+      has: [
+        {
+          type: "header",
+          key: "Cookie",
+        },
+      ],
+      permanent: false,
+      destination: "/profile",
+    },
+  ],
 };
 
 module.exports = nextConfig;
