@@ -8,7 +8,7 @@ import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
 import Layout from "../components/Layout";
 
-function Login() {
+export default function Login() {
   const router = useRouter();
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -56,7 +56,10 @@ function Login() {
   };
 
   return (
-    <Layout>
+    <Layout
+      headTitle="Login - Kitchen Sink Next"
+      headDesc="ALTA Kitchen Sink Next - Register"
+    >
       <div className="w-full h-full flex flex-col items-center justify-center">
         <form
           className="flex flex-col gap-4 min-w-[40%]"
@@ -92,5 +95,3 @@ function Login() {
     </Layout>
   );
 }
-
-export default Login;

@@ -1,8 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
-/* eslint-disable react-hooks/exhaustive-deps */
-import { getCookie } from "cookies-next";
+import { getCookie, deleteCookie } from "cookies-next";
 import React, { useState } from "react";
-import { useRouter } from "next/router";
 import Image from "next/image";
 
 import CustomButton from "../components/CustomButton";
@@ -35,6 +32,7 @@ export async function getServerSideProps({ req, res }) {
       props: { code: data.code, data: data.data, message: data.message, token },
     };
   } else {
+    deleteCookie("token");
     return {
       redirect: {
         permanent: false,
@@ -46,7 +44,7 @@ export async function getServerSideProps({ req, res }) {
 
 export default function Profile({ data, token }) {
   const [dataUser, setDataUser] = useState(data);
-  const [objSubmit, setObjSubmit] = useState("");
+  const [objSubmit, setObjSubmit] = useState({});
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -85,7 +83,10 @@ export default function Profile({ data, token }) {
   };
 
   return (
-    <Layout>
+    <Layout
+      headTitle="Profile - Kitchen Sink Next"
+      headDesc="ALTA Kitchen Sink Next - Profile"
+    >
       <div className="w-full h-full flex items-center justify-center gap-4">
         <Image
           src={dataUser.image}

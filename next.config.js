@@ -16,6 +16,17 @@ const nextConfig = {
       permanent: false,
       destination: "/profile",
     },
+    {
+      source: "/register",
+      has: [
+        {
+          type: "header",
+          key: "Cookie",
+        },
+      ],
+      permanent: false,
+      destination: "/profile",
+    },
   ],
 };
 
