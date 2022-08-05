@@ -1,4 +1,3 @@
-import { NotificationsProvider } from "@mantine/notifications";
 import { useState, useMemo, useEffect } from "react";
 import { getCookie } from "cookies-next";
 import { Provider } from "react-redux";
@@ -20,13 +19,11 @@ function MyApp({ Component, pageProps }) {
   }, [theme]);
 
   return (
-    <NotificationsProvider>
-      <Provider store={store}>
-        <ThemeContext.Provider value={background}>
-          <Component {...pageProps} />
-        </ThemeContext.Provider>
-      </Provider>
-    </NotificationsProvider>
+    <Provider store={store}>
+      <ThemeContext.Provider value={background}>
+        <Component {...pageProps} />
+      </ThemeContext.Provider>
+    </Provider>
   );
 }
 

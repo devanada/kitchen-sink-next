@@ -1,9 +1,10 @@
 import Link from "next/link";
+
 import Layout from "../components/Layout";
 
 export default function FourOhFour() {
   return (
-    <Layout center>
+    <Layout center headTitle="404 :(" headDesc="ALTA Kitchen Sink Next - 404">
       <h1 className="text-2xl font-semibold dark:text-white">
         404 - Page Not Found
       </h1>

@@ -6,7 +6,7 @@ import Layout from "../components/Layout";
 import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 
-function Register() {
+export default function Register() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -58,7 +58,10 @@ function Register() {
   };
 
   return (
-    <Layout>
+    <Layout
+      headTitle="Register - Kitchen Sink Next"
+      headDesc="ALTA Kitchen Sink Next - Register"
+    >
       <div className="w-full h-full flex flex-col items-center justify-center">
         <form
           className="flex flex-col gap-4 min-w-[40%]"
@@ -106,5 +109,3 @@ function Register() {
     </Layout>
   );
 }
-
-export default Register;
